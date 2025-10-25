@@ -29,19 +29,16 @@ export default function Jobs() {
 
   return (
     <div className="min-h-screen mt-32 w-full bg-gradient-to-br from-white to-indigo-50">
-      <BannerBackground bgImage={bannerUrl}>
-        <div className="pt-20 pb-16 px-4 text-center">
-          <motion.h1
-            className="text-4xl font-extrabold text-white mb-4 drop-shadow-lg"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            🚀 Vakansiyalar
-          </motion.h1>
-          <p className="text-white/90">Sizga mos ish o‘rinlarini ko‘rib chiqing</p>
-        </div>
-      </BannerBackground>
+      <motion.span
+        className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 drop-shadow-sm text-3xl md:text-4xl font-bold tracking-tight"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        🚀 Eng so‘nggi vakansiyalar
+      </motion.span>
+
+
 
       <div className="container mx-auto px-4 py-12">
         {jobs.length === 0 ? (
