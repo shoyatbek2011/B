@@ -1,122 +1,117 @@
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { motion, AnimatePresence } from "framer-motion";
-import Modal from "../components/Modal";
+import BannerBackground from "../components/BannerBackground";
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
-  const [active, setActive] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const currentUser = localStorage.getItem("currentUser");
 
   useEffect(() => {
-    const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setJobs(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-    return unsub;
+    const fetchJobs = async () => {
+      const snapshot = await getDocs(collection(db, "jobs"));
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setJobs(data);
+    };
+    fetchJobs();
   }, []);
 
-  const handleDelete = async (id, ownerId) => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (currentUser !== ownerId) return alert("⚠️ Faqat o‘zingizning e’lonni o‘chira olasiz!");
+  const handleDelete = async (id) => {
     await deleteDoc(doc(db, "jobs", id));
-    setActive(null);
+    setJobs(jobs.filter((j) => j.id !== id));
+    setSelected(null);
   };
 
-  return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">🏢 Vakansiyalar</h2>
+  const bannerUrl = "https://images.unsplash.com/photo-1507209696998-3c532be9b2b4?auto=format&fit=crop&w=1200&q=80";
 
-      <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <AnimatePresence>
-          {jobs.map((job, i) => (
-            <motion.div
-              key={job.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-              onClick={() => setActive(job)}
-              className="bg-white p-5 rounded-2xl shadow hover:shadow-lg transition cursor-pointer border border-gray-100"
-            >
-              <h3 className="font-semibold text-lg text-gray-800">{job.title}</h3>
-              <p className="text-sm text-gray-500 mb-2">🏢 {job.company}</p>
-              <p className="text-gray-700 text-sm line-clamp-3">{job.description}</p>
-              {job.salary && (
-                <p className="text-xs text-green-600 mt-2 font-medium">
-                  💰 Maosh: {job.salary}
-                </p>
-              )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+  return (
+    <div className="min-h-screen mt-32 w-full bg-gradient-to-br from-white to-indigo-50">
+      <BannerBackground bgImage={bannerUrl}>
+        <div className="pt-20 pb-16 px-4 text-center">
+          <motion.h1
+            className="text-4xl font-extrabold text-white mb-4 drop-shadow-lg"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            🚀 Vakansiyalar
+          </motion.h1>
+          <p className="text-white/90">Sizga mos ish o‘rinlarini ko‘rib chiqing</p>
+        </div>
+      </BannerBackground>
+
+      <div className="container mx-auto px-4 py-12">
+        {jobs.length === 0 ? (
+          <p className="text-center text-gray-600">Hozircha vakansiya yo‘q</p>
+        ) : (
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {jobs.map((j, i) => (
+              <motion.div
+                key={j.id}
+                className="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-indigo-600 hover:scale-105 transition-all"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+              >
+                <h3 className="text-xl font-semibold text-indigo-700">{j.title}</h3>
+                <p className="text-gray-500 mt-2">{j.description.slice(0, 100)}...</p>
+                <p className="text-green-600 font-bold mt-2">{j.budget || "Narx belgilanmagan"}</p>
+                <button
+                  onClick={() => setSelected(j)}
+                  className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+                >
+                  Batafsil
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <AnimatePresence>
-        {active && (
-          <Modal onClose={() => setActive(null)}>
+        {selected && (
+          <>
             <motion.div
-              className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-[90%] sm:w-[500px] mx-auto"
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelected(null)}
+            />
+            <motion.div
+              className="fixed inset-0 flex items-center justify-center p-4"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">{active.title}</h3>
-              <p className="text-gray-500 text-sm mb-2">🏢 {active.company}</p>
+              <div className="bg-white w-full max-w-lg rounded-xl p-6 shadow-lg">
+                <h2 className="text-2xl font-bold text-indigo-700">{selected.title}</h2>
+                <p className="mt-2">{selected.description}</p>
+                <p className="mt-2 text-green-600">{selected.budget}</p>
+                <p className="mt-2 text-blue-600">{selected.contact}</p>
 
-              {active.salary && (
-                <p className="text-gray-700 mb-2">
-                  💰 <strong>Maosh:</strong> {active.salary}
-                </p>
-              )}
-
-              {active.experience && (
-                <p className="text-gray-700 mb-2">
-                  🧠 <strong>Tajriba:</strong> {active.experience} yil
-                </p>
-              )}
-
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap mb-3">
-                {active.description}
-              </p>
-
-              {active.contact && (
-                <a
-                  href={
-                    active.contact.startsWith("@")
-                      ? `https://t.me/${active.contact.replace("@", "")}`
-                      : active.contact.includes("+")
-                      ? `tel:${active.contact}`
-                      : `mailto:${active.contact}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                >
-                  ✉️ Bog‘lanish
-                </a>
-              )}
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  onClick={() => setActive(null)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
-                >
-                  Yopish
-                </button>
-                {localStorage.getItem("currentUser") === active.owner && (
+                <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => handleDelete(active.id, active.owner)}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                    onClick={() => setSelected(null)}
+                    className="flex-1 py-2 border rounded-lg hover:bg-gray-50 transition"
                   >
-                    O‘chirish
+                    Yopish
                   </button>
-                )}
+                  {selected.owner === currentUser && (
+                    <button
+                      onClick={() => handleDelete(selected.id)}
+                      className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                    >
+                      O‘chirish
+                    </button>
+                  )}
+                </div>
               </div>
             </motion.div>
-          </Modal>
+          </>
         )}
       </AnimatePresence>
     </div>
