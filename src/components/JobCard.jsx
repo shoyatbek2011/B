@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-/**
- * JobCard — karta + batafsil modal
- * Props: { id, title, company, salary, type, location, description, skills, postedAt }
- */
+
 export default function JobCard({
   id,
   title,
@@ -17,7 +14,7 @@ export default function JobCard({
 }) {
   const [open, setOpen] = useState(false);
 
-  // ESC bilan yopish
+ 
   useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") setOpen(false);
@@ -26,9 +23,9 @@ export default function JobCard({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Apply tugmasi — hozircha placeholder (backend bog'lanishi mumkin)
+  
   function handleApply() {
-    // TODO: replace with real apply flow (API call / auth check)
+   
     alert(`Siz “${title}” lavozimiga ariza yubordingiz (demo).`);
   }
 
@@ -39,7 +36,7 @@ export default function JobCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {/* simple svg briefcase */}
+             
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path d="M3 7h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"></path>
                 <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"></path>
@@ -144,6 +141,8 @@ export default function JobCard({
             <div className="flex items-center justify-between gap-4">
               <div className="text-sm text-gray-500">ID: {id}</div>
               <div className="flex gap-3">
+
+
                 <button
                   onClick={handleApply}
                   className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"

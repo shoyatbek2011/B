@@ -79,7 +79,7 @@ export default function AdminAdd() {
   };
 
   return (
-    <div className="min-h-screen mt-32 py-16 px-6 mt-8">
+    <div className="min-h-screen mt-32 py-16 px-6 ">
       <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
         {!category ? (
           <div className="text-center space-y-6">
