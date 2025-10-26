@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import BannerBackground from "../components/BannerBackground";
 import BannerSlider from "../components/BannerSlider";
 
@@ -74,13 +75,25 @@ export default function Home() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 2, duration: 0.8, ease: "easeOut" }}
         >
-         
+          <Link
+            to="/freelancers"
+            className="px-8 py-3 bg-pink-600 text-white font-semibold rounded-xl shadow-lg hover:bg-pink-700 transition transform hover:scale-105"
+          >
+            Freelancerlarni ko‘rish
+          </Link>
+
+          <Link
+            to="/jobs"
+            className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:bg-indigo-700 transition transform hover:scale-105"
+          >
+            Ishlarni ko‘rish
+          </Link>
         </motion.div>
       </motion.section>
 
-      {/* Agar slider sahifaning pastida bo‘lishini istasangiz */}
+      {/* Slider joyi (agar kerak bo‘lsa) */}
       <div className="flex-1 max-w-5xl mx-auto px-4 mb-16">
-        
+        {/* <BannerSlider /> */}
       </div>
     </div>
   );
